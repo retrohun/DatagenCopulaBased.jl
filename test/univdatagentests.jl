@@ -1,13 +1,19 @@
 
 @testset "logseries dist" begin
-  @test logseriescdf(0.01)[1:3] ≈ [0.0, 0.994992, 0.999967] atol=1.0e-5
-  @test logseriesquantile(0.9, [0.25, 0.5, 0.75]) == [1, 2, 5]
+  @test map(x->cdf(Logarithmic(0.01), x), 1:2) ≈ [0.994992, 0.999967] atol=1.0e-5
+
+  dist = Logarithmic(0.9)
+  @test map(x->quantile(dist, x), [0.25, 0.5, 0.75]) == [1, 2, 5]
+
   srand(43)
-  v = logseriesquantile(0.4, rand(1000000))
-  @test mean(v) ≈ 1.304 atol=1.0e-2
-  @test std(v) ≈ 0.687 atol=1.0e-2
+  d = Logarithmic(0.4)
+  @test mean(d) ≈ 1.304 atol=1.0e-2
+  @test std(d) ≈ 0.687 atol=1.0e-2
+
+  v = rand(d, 1000000)
   @test skewness(v) ≈ 3.1 atol=1.0e-2
   @test kurtosis(v) ≈ 13.5 atol=1.0
+
 end
 @testset "stable levy dist" begin
   srand(43)

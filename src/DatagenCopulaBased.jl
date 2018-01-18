@@ -7,6 +7,14 @@ module DatagenCopulaBased
   using PyCall
   @pyimport scipy.cluster.hierarchy as sch
 
+
+  # new
+  include("univariate_utils/logarithmic.jl")
+  include("univariate_utils/stable.jl")
+  include("univariate_utils/exptiltedposlevy.jl")
+
+  export rand
+  # old
   include("sampleunivdists.jl")
   include("archcopcorrelations.jl")
   include("archcopulagendat.jl")

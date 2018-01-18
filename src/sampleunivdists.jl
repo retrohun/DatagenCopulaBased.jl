@@ -1,72 +1,25 @@
-"""
-  logseriescdf(p::Float64)
-
-Returns a vector{Float} of the discrete cdf of logarithmic distribution
-"""
-
-function logseriescdf(p::Float64)
-  cdfs = [0.]
-  for i in 1:100000000
-    @inbounds push!(cdfs, cdfs[i]-(p^i)/(i*log(1-p)))
-    if cdfs[i] ≈ 1.0
-      return cdfs
-    end
-  end
-  cdfs
-end
-
-"""
-  logseriesquantile(p::Float64, v::Vector{Float64})
-
-Returns a vector{Float} of the v[i] th quaintlie of logaritmic distribution with parameter p
-"""
-
+#TODO: remove
 function logseriesquantile(p::Float64, v::Vector{Float64})
-  w = logseriescdf(p)
-  pmap(i -> findlast(w .< i), v)
+  dist = Logarithmic(p)
+  map(x->quantile(dist, x), v)
 end
 
-"""
-  levyel(θ::Union{Int, Float64, u::Vector{Float64})
-
-An element from Levy stable distribution with parameters α = 1/θ, β = 1,
-γ = (cos(pi/(2*θ)))^θ and δ = 0.
-Return Float, given parameter ϴ of dostribution
-"""
-
+#TODO: remove
 function levyel(θ::Union{Int, Float64})
-  ϕ = pi*rand()-pi/2
-  v = quantile.(Exponential(1.), rand())
-  γ = (cos(pi/(2*θ)))^θ
-  v = ((cos(pi/(2*θ)+(1/θ-1)*ϕ))/v)^(θ-1)
-  γ*v*sin(1/θ*(pi/2+ϕ))*(cos(pi/(2*θ))*cos(ϕ))^(-θ)
-end
+  rand(StableGumbel(θ))
+end # rand δ -> μ, γ -> c
 
-
-"""
-Return a Vectof(Floast} of  of pseudo cdf of Levy stable distribution with parameters
-α = 1/θ, β = 1, γ = (cos(pi/(2*θ)))^θ and δ = 0, given a vector of Floats - u
-
-"""
-
+#TODO: remove
 function levygen(θ::Union{Int, Float64}, u::Vector{Float64})
-  p = invperm(sortperm(u))
-  v = [levyel(θ) for a in u]
-  sort(v)[p]
-end
-
-"""
-  tiltedlevygen(V0::Vector{Float64}, α::Float64)
-
-Returns a Vector{Floats} genrated from the expotencialy tilted levy stable pdf
-f(x; V0, α) = exp(-V0^α) g(x; α)/exp(-V0), where g(x; α) is a stable Levy pdf
-with parameters α = 1/θ, β = 1, γ = (cos(pi/(2*θ)))^θ and δ = 0.
+  rand(StableGumbel(θ), u)
+end #u - vector rand()
 
 
-"""
 
+#TODO remove
 function tiltedlevygen(V0::Vector{Float64}, α::Float64)
-  t = length(V0)
+  rand(ExpTiltedPosLevy(α), V0)
+  #=t = length(V0)
   ret = zeros(t)
   for i in 1:t
     x = levyel(α)
@@ -77,8 +30,8 @@ function tiltedlevygen(V0::Vector{Float64}, α::Float64)
     end
     ret[i] = x
   end
-  ret.*V0.^α
-end
+  ret.*V0.^α=#
+end #rand ExpTiltedPosStable
 
 
 """
